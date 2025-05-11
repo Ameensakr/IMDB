@@ -57,7 +57,6 @@ const initializeFilms = async () => {
             await Film.insertMany(films);
         }
     } catch (error) {
-        res.status(500).json({ error: 'Error initializing films' });
     }
 };
 

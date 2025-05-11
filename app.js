@@ -12,8 +12,12 @@ const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retr
 
 mongoose.connect(uri)
     .then((result) => {
-        app.listen(3000);
-        console.log('MongoDB connected successfully!');
+        if (process.env.NODE_ENV !== 'test')
+        {
+            app.listen(3000);
+            console.log('MongoDB connected successfully!');
+        }
+        
     })
     .catch((err) => {
         console.error('MongoDB connection error:');

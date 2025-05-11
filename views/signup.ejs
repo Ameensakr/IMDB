@@ -23,14 +23,16 @@
           <label for="firstName">First Name</label>
           <div class="input-with-icon">
             <i class="fas fa-user input-icon"></i>
-            <input type="text" id="firstName" name="firstName" required>
+            <input type="text" id="firstName" name="firstName" required 
+              value="<%= typeof formData !== 'undefined' ? formData.firstName || '' : '' %>">
           </div>
         </div>
         <div class="form-group">
           <label for="lastName">Last Name</label>
           <div class="input-with-icon">
             <i class="fas fa-user input-icon"></i>
-            <input type="text" id="lastName" name="lastName" required>
+            <input type="text" id="lastName" name="lastName" required
+              value="<%= typeof formData !== 'undefined' ? formData.lastName || '' : '' %>">
           </div>
         </div>
       </div>
@@ -39,7 +41,8 @@
         <label for="email">Email</label>
         <div class="input-with-icon">
           <i class="fas fa-envelope input-icon"></i>
-          <input type="email" id="email" name="email" required>
+          <input type="email" id="email" name="email" required
+            value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>">
         </div>
       </div>
 
@@ -47,7 +50,8 @@
         <label for="mobile">Mobile Number</label>
         <div class="input-with-icon">
           <i class="fas fa-phone input-icon"></i>
-          <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" placeholder="10-digit number" required>
+          <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" placeholder="10-digit number" required
+            value="<%= typeof formData !== 'undefined' ? formData.mobile || '' : '' %>">
         </div>
       </div>
 
@@ -55,11 +59,13 @@
         <label>Gender</label>
         <div class="gender-options">
           <label class="radio-label">
-            <input type="radio" name="gender" value="male" required>
+            <input type="radio" name="gender" value="male" required
+              <%= typeof formData !== 'undefined' && formData.gender === 'male' ? 'checked' : '' %>>
             <i class="fas fa-male"></i> Male
           </label>
           <label class="radio-label">
-            <input type="radio" name="gender" value="female">
+            <input type="radio" name="gender" value="female"
+              <%= typeof formData !== 'undefined' && formData.gender === 'female' ? 'checked' : '' %>>
             <i class="fas fa-female"></i> Female
           </label>
         </div>

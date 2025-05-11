@@ -42,7 +42,7 @@ const signup = async (req, res) => {
             email: user.email
         };
         
-        res.redirect('/welcome');
+        res.redirect('/index');
     } catch (error) {
         // Handle validation errors
         if (error.name === 'ValidationError') {
