@@ -1,35 +1,130 @@
 <%- include('../partials/header') %>
+<%- include('../partials/nav', { user: user }) %>
 
 <div class="welcome-container">
-  <h1>Welcome, [User]!</h1>
+  <h1>Welcome, <%= user ? `${user.firstName} ${user.lastName}` : 'Guest' %>!</h1>
   <p>Here are some films we think you'll love:</p>
-  <div class="recommended-films">
-    <div class="film-card">
-      <div class="film-icon">🎬</div>
-      <h3>The Shawshank Redemption</h3>
-      <p class="film-genre">Drama</p>
-      <p class="film-rating">⭐ 9.3/10</p>
+  
+  <% if (films && films.length > 0) { %>
+    <div class="recommended-films">
+      <% films.forEach(film => { %>
+        <div class="film-card">
+          <div class="film-poster">
+            <img src="<%= film.posterUrl %>" alt="<%= film.title %> poster">
+          </div>
+          <div class="film-info">
+            <h3><%= film.title %></h3>
+            <p class="film-genre"><%= film.genre.join(', ') %></p>
+            <p class="film-rating">⭐ <%= film.rating %>/10</p>
+            <p class="film-year"><%= film.releaseYear %></p>
+            <p class="film-duration">⏱️ <%= film.duration %> min</p>
+          </div>
+        </div>
+      <% }); %>
     </div>
-    <div class="film-card">
-      <div class="film-icon">🎬</div>
-      <h3>The Godfather</h3>
-      <p class="film-genre">Crime, Drama</p>
-      <p class="film-rating">⭐ 9.2/10</p>
-    </div>
-    <div class="film-card">
-      <div class="film-icon">🎬</div>
-      <h3>The Dark Knight</h3>
-      <p class="film-genre">Action, Crime</p>
-      <p class="film-rating">⭐ 9.0/10</p>
-    </div>
-    <div class="film-card">
-      <div class="film-icon">🎬</div>
-      <h3>Pulp Fiction</h3>
-      <p class="film-genre">Crime, Drama</p>
-      <p class="film-rating">⭐ 8.9/10</p>
-    </div>
-  </div>
-  <button class="logout-btn">Logout</button>
+  <% } else { %>
+    <p>No films available at the moment.</p>
+  <% } %>
+
+  <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
 </div>
+
+<style>
+.welcome-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.recommended-films {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.film-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.film-card:hover {
+  transform: translateY(-5px);
+}
+
+.film-poster {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.film-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.film-info {
+  padding: 15px;
+}
+
+.film-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.film-genre {
+  color: #666;
+  font-size: 0.9em;
+  margin: 5px 0;
+}
+
+.film-rating {
+  color: #f5c518;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.film-year, .film-duration {
+  color: #666;
+  font-size: 0.9em;
+  margin: 5px 0;
+}
+
+.film-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 15px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.film-link:hover {
+  background: #0056b3;
+}
+
+.logout-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+}
+</style>
 
 <%- include('../partials/footer') %>

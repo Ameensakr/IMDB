@@ -3,6 +3,20 @@
 <div class="container">
   <div class="signup-box">
     <h1>Create Account</h1>
+    
+    <% if (typeof error !== 'undefined') { %>
+      <div class="error-message">
+        <p><%= error %></p>
+        <% if (typeof validationErrors !== 'undefined') { %>
+          <ul>
+            <% for (let field in validationErrors) { %>
+              <li><%= validationErrors[field] %></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    <% } %>
+
     <form action="/signup" method="POST">
       <div class="form-row">
         <div class="form-group">
@@ -78,6 +92,26 @@
     <p class="signup-link">Already have an account? <a href="/">Login</a></p>
   </div>
 </div>
+
+<style>
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.error-message ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 5px 0;
+}
+
+.error-message li {
+  margin: 5px 0;
+}
+</style>
 
 <script>
 function togglePassword(inputId) {

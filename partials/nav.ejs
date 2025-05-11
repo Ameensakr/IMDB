@@ -2,5 +2,8 @@
   <ul>
     <li><a href="/">Home</a></li>
     <li><a href="/signup">Sign Up</a></li>
+    <% if (user) { %>
+      <li><a href="/logout">Logout</a></li>
+    <% } %>
   </ul>
 </nav>
