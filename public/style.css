@@ -25,23 +25,45 @@ header {
   font-size: 24px;
 }
 
-/* Navigation Styles */
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 2rem;
-  margin-top: 1rem;
+/* Updated Navigation Styles */
+.main-nav {
+    background-color: #1a237e;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-nav a {
-  color: #333;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+.nav-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
 }
 
-nav a:hover {
-  color: #2a5298;
+.site-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.user-controls {
+    margin-left: auto;
+    padding-right: 20px;
+}
+
+.logout-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.1);
+    transition: background-color 0.3s ease;
+}
+
+.logout-link:hover {
+    background-color: rgba(255,255,255,0.2);
 }
 
 /* Login/Signup Container Styles */
@@ -366,4 +388,35 @@ button[type="submit"] {
 .signup-link {
     margin-top: 1rem;
     font-size: 0.9rem;
+}
+
+/* Updated Logout Button Styles */
+.logout-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f5515f, #c04848);
+    box-shadow: 0 4px 10px rgba(192, 72, 72, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.logout-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(192, 72, 72, 0.4);
+    background: linear-gradient(135deg, #f5515f, #9f3a3a);
+}
+
+.logout-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(192, 72, 72, 0.4);
+}
+
+.logout-button i {
+    font-size: 1rem;
 }

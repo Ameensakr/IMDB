@@ -77,68 +77,8 @@ const getAllFilms = async (req, res) => {
     }
 };
 
-// Get film by ID
-const getFilmById = async (req, res) => {
-    try {
-        const film = await Film.findById(req.params.id);
-        if (!film) {
-            return res.status(404).render('404');
-        }
-        res.render('film-details', { film });
-    } catch (error) {
-        console.error('Error fetching film:', error);
-        res.status(500).render('404');
-    }
-};
 
-// Create new film
-const createFilm = async (req, res) => {
-    try {
-        const film = new Film(req.body);
-        await film.save();
-        res.status(201).json(film);
-    } catch (error) {
-        console.error('Error creating film:', error);
-        res.status(500).json({ error: 'Error creating film' });
-    }
-};
-
-// Update film
-const updateFilm = async (req, res) => {
-    try {
-        const film = await Film.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
-        if (!film) {
-            return res.status(404).json({ error: 'Film not found' });
-        }
-        res.json(film);
-    } catch (error) {
-        console.error('Error updating film:', error);
-        res.status(500).json({ error: 'Error updating film' });
-    }
-};
-
-// Delete film
-const deleteFilm = async (req, res) => {
-    try {
-        const film = await Film.findByIdAndDelete(req.params.id);
-        if (!film) {
-            return res.status(404).json({ error: 'Film not found' });
-        }
-        res.json({ message: 'Film deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting film:', error);
-        res.status(500).json({ error: 'Error deleting film' });
-    }
-};
 
 module.exports = {
-    getAllFilms,
-    getFilmById,
-    createFilm,
-    updateFilm,
-    deleteFilm
+    getAllFilms
 }; 

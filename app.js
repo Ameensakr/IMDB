@@ -8,11 +8,11 @@ const userController = require('./controllers/userController');
 const filmController = require('./controllers/filmController');
 
 // MongoDB connection
-const uri = 'mongodb+srv://samehmostafa625:PX40KeAYz4cOzlum@imdb.lyakcv9.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
+const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
 mongoose.connect(uri)
     .then((result) => {
-        app.listen(3001);
+        app.listen(3000);
         console.log('MongoDB connected successfully!');
     })
     .catch((err) => {
@@ -38,25 +38,49 @@ app.use(session({
     }
 }));
 
+// Add this middleware function after your session setup
+const requireAuth = (req, res, next) => {
+  if (req.session.userId) {
+    next(); // User is logged in, continue
+  } else {
+    res.redirect('/'); // Not logged in, redirect to login
+  }
+};
+
+const checkLoggedIn = (req, res, next) => {
+  if (req.session.userId) {
+    // console.log('ana hena');
+    return res.redirect('/welcome'); // Already logged in, redirect to welcome
+  } else {
+    next(); // Not logged in, proceed to login page
+  }
+};
+
 // Routes
-app.get('/', (req, res) => {
-    res.render('index');
+app.get('/', checkLoggedIn, (req, res) => {
+    res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
+    res.render('index', { user: req.session.user || null });
 });
 
 // User routes
-app.get('/signup', (req, res) => {
-    res.render('signup');
+app.get('/signup', checkLoggedIn, (req, res) => {
+    res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
+    res.render('signup', { user: req.session.user || null });
 });
+
 app.post('/signup', userController.signup);
 app.post('/login', userController.login);
-app.get('/logout', userController.logout);
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
 
 // Film routes
-app.get('/welcome', filmController.getAllFilms);
-app.get('/films/:id', filmController.getFilmById);
-app.post('/films', filmController.createFilm);
-app.put('/films/:id', filmController.updateFilm);
-app.delete('/films/:id', filmController.deleteFilm);
+app.get('/welcome', requireAuth, filmController.getAllFilms);
 
 // 404 handler
 app.use((req, res) => {

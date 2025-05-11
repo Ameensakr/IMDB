@@ -1,9 +1,11 @@
-<nav>
-  <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/signup">Sign Up</a></li>
+<nav class="main-nav">
+  <div class="nav-container">
     <% if (user) { %>
-      <li><a href="/logout">Logout</a></li>
+      <div class="user-controls">
+        <a href="/logout" class="logout-button">
+          <i class="fas fa-sign-out-alt" , ></i> Logout
+        </a>
+      </div>
     <% } %>
-  </ul>
+  </div>
 </nav>

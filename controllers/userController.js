@@ -95,6 +95,8 @@ const login = async (req, res) => {
             email: user.email
         };
 
+
+        req.session.userId = user._id; // Set the session
         res.redirect('/welcome');
     } catch (error) {
         res.status(500).render('index', { 
