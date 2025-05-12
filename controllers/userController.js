@@ -33,6 +33,8 @@ const signup = async (req, res) => {
         });
 
         await user.save();
+
+        
         
         // Set user session after successful signup
         req.session.user = {
@@ -41,8 +43,9 @@ const signup = async (req, res) => {
             lastName: user.lastName,
             email: user.email
         };
+        console.log('ana hena');
         
-        res.redirect('/index');
+        res.redirect('/');
     } catch (error) {
         // Handle validation errors
         if (error.name === 'ValidationError') {

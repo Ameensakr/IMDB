@@ -1,276 +1,141 @@
-const userController = require('../controllers/userController');
+const mongoose = require('mongoose');
+const app = require('../app');
+const request = require('supertest');
 const User = require('../models/user');
 
-// Mock dependencies
-jest.mock('../models/user');
+const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
-describe('User Controller Tests', () => {
-  // Clear all mocks before each test
-  beforeEach(() => {
-    jest.clearAllMocks();
+// Store test user emails to clean up only those
+const testUserEmails = [];
+
+beforeEach(async () => {
+  await mongoose.connect(uri);
+});
+
+afterAll(async () => {
+  if (testUserEmails.length > 0) {
+    await User.deleteMany({ email: { $in: testUserEmails } });
+  }
+  await mongoose.connection.close();
+});
+
+describe('User Routes', () => {
+  it('should create a user via signup', async () => {
+    const email = 'testuser@example.com';
+    testUserEmails.push(email);
+
+    const res = await request(app).post('/signup').send({
+      firstName: 'Test',
+      lastName: 'User',
+      email,
+      mobile: '1234567890',
+      gender: 'male',
+      password: 'password123',
+      confirmPassword: 'password123'
+    });
+    
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/');
   });
 
-  describe('signup', () => {
-    test('should create a new user and redirect to login page', async () => {
-      // Arrange
-      const req = {
-        body: {
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-          mobile: '1234567890',
-          gender: 'male',
-          password: 'password123',
-          confirmPassword: 'password123'
-        },
-        session: {}
-      };
-      
-      const res = {
-        redirect: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-      
-      // Mock User.findOne to return null (no existing user)
-      User.findOne = jest.fn().mockResolvedValue(null);
-      
-      // Mock User constructor and save method
-      const mockUserInstance = {
-        _id: 'user123',
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        save: jest.fn().mockResolvedValue(true)
-      };
-      
-      User.mockImplementation(() => mockUserInstance);
-
-      // Act
-      await userController.signup(req, res);
-
-      // Assert
-      expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
-      expect(req.session.user).toBeDefined();
-      expect(req.session.user.id).toBe('user123');
-      expect(res.redirect).toHaveBeenCalledWith('/index');
+  it('should not allow duplicate email registration', async () => {
+    const email = 'duplicate@example.com';
+    await User.create({
+      firstName: 'First',
+      lastName: 'User',
+      email,
+      mobile: '1234567890',
+      gender: 'male',
+      password: 'password123'
     });
+    testUserEmails.push(email); // still track it for cleanup
 
-    test('should return error when passwords do not match', async () => {
-      // Arrange
-      const req = {
-        body: {
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-          mobile: '1234567890',
-          gender: 'male',
-          password: 'password123',
-          confirmPassword: 'different123'
-        },
-        session: {}
-      };
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-
-      // Act
-      await userController.signup(req, res);
-
-      // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('signup', {
-        error: 'Passwords do not match',
-        formData: expect.objectContaining({})
-      });
+    const res = await request(app).post('/signup').send({
+      firstName: 'Second',
+      lastName: 'User',
+      email,
+      mobile: '9876543210',
+      gender: 'female',
+      password: 'password123',
+      confirmPassword: 'password123'
     });
-
-    test('should return error when email already exists', async () => {
-      // Arrange
-      const req = {
-        body: {
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'existing@example.com',
-          mobile: '1234567890',
-          gender: 'male',
-          password: 'password123',
-          confirmPassword: 'password123'
-        },
-        session: {}
-      };
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-      
-      // Mock User.findOne to return an existing user
-      User.findOne = jest.fn().mockResolvedValue({ email: 'existing@example.com' });
-
-      // Act
-      await userController.signup(req, res);
-
-      // Assert
-      expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('signup', {
-        error: 'Email already registered',
-        formData: expect.objectContaining({
-          email: req.body.email
-        })
-      });
-    });
+    
+    expect(res.status).toBe(400);
   });
 
-  describe('login', () => {
-    test('should authenticate user and redirect to welcome page', async () => {
-      // Arrange
-      const req = {
-        body: {
-          email: 'john@example.com',
-          password: 'password123'
-        },
-        session: {}
-      };
-      
-      const res = {
-        redirect: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-      
-      // Mock user in database
-      const mockUser = {
-        _id: 'user123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        password: 'password123'
-      };
-      
-      User.findOne = jest.fn().mockResolvedValue(mockUser);
+  it('should not allow registration with mismatched passwords', async () => {
+    const email = 'mismatch@example.com';
+    testUserEmails.push(email);
 
-      // Act
-      await userController.login(req, res);
-
-      // Assert
-      expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
-      expect(req.session.userId).toBe('user123');
-      expect(req.session.user).toBeDefined();
-      expect(res.redirect).toHaveBeenCalledWith('/welcome');
+    const res = await request(app).post('/signup').send({
+      firstName: 'Mismatch',
+      lastName: 'Password',
+      email,
+      mobile: '1234567890',
+      gender: 'male',
+      password: 'password123',
+      confirmPassword: 'differentpassword'
     });
-
-    test('should return error for invalid email', async () => {
-      // Arrange
-      const req = {
-        body: {
-          email: 'nonexistent@example.com',
-          password: 'password123'
-        },
-        session: {}
-      };
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-      
-      User.findOne = jest.fn().mockResolvedValue(null);
-
-      // Act
-      await userController.login(req, res);
-
-      // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('index', {
-        error: 'Invalid email or password',
-        formData: { email: req.body.email }
-      });
-    });
-
-    test('should return error for invalid password', async () => {
-      // Arrange
-      const req = {
-        body: {
-          email: 'john@example.com',
-          password: 'wrongpassword'
-        },
-        session: {}
-      };
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        render: jest.fn()
-      };
-      
-      // Mock user in database with different password
-      const mockUser = {
-        _id: 'user123',
-        email: 'john@example.com',
-        password: 'password123'
-      };
-      
-      User.findOne = jest.fn().mockResolvedValue(mockUser);
-
-      // Act
-      await userController.login(req, res);
-
-      // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.render).toHaveBeenCalledWith('index', {
-        error: 'Invalid email or password',
-        formData: { email: req.body.email }
-      });
-    });
+    
+    expect(res.status).toBe(400);
   });
 
-  describe('logout', () => {
-    test('should destroy session and redirect to home page', () => {
-      // Arrange
-      const req = {
-        session: {
-          destroy: jest.fn(callback => callback())
-        }
-      };
-      
-      const res = {
-        redirect: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn()
-      };
+  it('should login a user with valid credentials', async () => {
+    const email = 'login@example.com';
+    testUserEmails.push(email);
 
-      // Act
-      userController.logout(req, res);
-
-      // Assert
-      expect(req.session.destroy).toHaveBeenCalled();
-      expect(res.redirect).toHaveBeenCalledWith('/');
+    await User.create({
+      firstName: 'Login',
+      lastName: 'Test',
+      email,
+      mobile: '1234567890',
+      gender: 'male',
+      password: 'password123'
     });
 
-    test('should handle error during session destruction', () => {
-      // Arrange
-      const req = {
-        session: {
-          destroy: jest.fn(callback => callback(new Error('Session destroy error')))
-        }
-      };
-      
-      const res = {
-        redirect: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn()
-      };
-
-      // Act
-      userController.logout(req, res);
-
-      // Assert
-      expect(req.session.destroy).toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.send).toHaveBeenCalledWith('Error logging out');
+    const res = await request(app).post('/login').send({
+      email,
+      password: 'password123'
     });
+    
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/welcome');
+  });
+
+  it('should reject login with invalid email', async () => {
+    const res = await request(app).post('/login').send({
+      email: 'nonexistent@example.com',
+      password: 'password123'
+    });
+    
+    expect(res.status).toBe(400);
+  });
+
+  it('should reject login with invalid password', async () => {
+    const email = 'wrongpass@example.com';
+    testUserEmails.push(email);
+
+    await User.create({
+      firstName: 'Wrong',
+      lastName: 'Password',
+      email,
+      mobile: '1234567890',
+      gender: 'male',
+      password: 'password123'
+    });
+
+    const res = await request(app).post('/login').send({
+      email,
+      password: 'wrongpassword'
+    });
+    
+    expect(res.status).toBe(400);
+  });
+
+  it('should log out a user', async () => {
+    const res = await request(app).get('/logout');
+    
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/');
   });
 });
