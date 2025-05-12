@@ -85,6 +85,8 @@ app.get('/logout', (req, res) => {
 
 // Film routes
 app.get('/welcome', requireAuth, filmController.getAllFilms);
+app.get('/films/add', requireAuth, filmController.getAddFilmForm);
+app.post('/films/add', requireAuth, filmController.addFilm);
 
 // 404 handler
 app.use((req, res) => {

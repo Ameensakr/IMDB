@@ -76,8 +76,34 @@ const getAllFilms = async (req, res) => {
     }
 };
 
+// Get add film form
+const getAddFilmForm = (req, res) => {
+    res.render('add-film');
+};
 
+// Add new film
+const addFilm = async (req, res) => {
+    try {
+        const filmData = {
+            ...req.body,
+            genre: req.body.genre.split(',').map(g => g.trim()),
+            cast: req.body.cast ? req.body.cast.split(',').map(c => c.trim()) : []
+        };
+
+        const film = new Film(filmData);
+        await film.save();
+        
+        res.redirect('/welcome');
+    } catch (error) {
+        console.error('Error adding film:', error);
+        res.status(500).render('add-film', {
+            error: 'Error adding film. Please try again.'
+        });
+    }
+};
 
 module.exports = {
-    getAllFilms
+    getAllFilms,
+    getAddFilmForm,
+    addFilm
 }; 
