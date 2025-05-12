@@ -3,7 +3,7 @@ const app = require('../app');
 const request = require('supertest');
 const User = require('../models/user');
 
-const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
+const uri = 'mongodb+srv://samehmostafa625:PX40KeAYz4cOzlum@imdb.lyakcv9.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
 // Store test user emails to clean up only those
 const testUserEmails = [];

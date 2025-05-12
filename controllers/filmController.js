@@ -63,16 +63,34 @@ const initializeFilms = async () => {
 // Call initializeFilms when the server starts
 initializeFilms();
 
+// Get total number of films
+const getTotalFilms = async () => {
+    try {
+        const count = await Film.countDocuments();
+        return count;
+    } catch (error) {
+        console.error('Error counting films:', error);
+        return 0;
+    }
+};
+
 // Get all films
 const getAllFilms = async (req, res) => {
     try {
         const films = await Film.find().sort({ rating: -1 });
-        // Get user information from session or request
+        const totalFilms = await getTotalFilms(); // Use the new function
         const user = req.session.user || null;
-        res.render('welcome', { films, user });
+        res.render('welcome', { 
+            films, 
+            user,
+            totalFilms
+        });
     } catch (error) {
         console.error('Error fetching films:', error);
-        res.status(500).render('welcome', { error: 'Error fetching films' });
+        res.status(500).render('welcome', { 
+            error: 'Error fetching films',
+            totalFilms: 0 
+        });
     }
 };
 
@@ -105,5 +123,6 @@ const addFilm = async (req, res) => {
 module.exports = {
     getAllFilms,
     getAddFilmForm,
-    addFilm
-}; 
+    addFilm,
+    getTotalFilms // Add this to exports
+};

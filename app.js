@@ -8,7 +8,7 @@ const userController = require('./controllers/userController');
 const filmController = require('./controllers/filmController');
 
 // MongoDB connection
-const uri = 'mongodb+srv://Ameen:WKWh4dux4xotZGrg@imdb.hn3af24.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
+const uri = 'mongodb+srv://samehmostafa625:PX40KeAYz4cOzlum@imdb.lyakcv9.mongodb.net/?retryWrites=true&w=majority&appName=imdb';
 
 mongoose.connect(uri)
     .then((result) => {
